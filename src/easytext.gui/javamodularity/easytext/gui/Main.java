@@ -49,8 +49,21 @@ public class Main extends Application {
         btn2.setOnAction(event -> {
           File file = new DirectoryChooser().showDialog(primaryStage.getOwner());
           if (file != null) {
+            analyzers.clear();
+            System.out.println("Aantal analysers should be 0:"+analyzers.size());
             ModuleLayer layer = loadAnalysisInLayer(file);
-            ServiceLoader.load(layer, Analyzer.class).forEach(analyzers::add);
+            ServiceLoader<Analyzer> iterator  = ServiceLoader.load(layer, Analyzer.class);
+            List<String> knownAnalyzers = new ArrayList<>();
+            for ( Analyzer a : iterator) {
+              if ( knownAnalyzers.contains(a.getName())) {
+                System.out.println("Already in list: "+ a.getName());
+                continue;
+              }
+              System.out.println("Adding "+ a.getName());
+              knownAnalyzers.add(a.getName());
+              analyzers.add(a);
+            }
+            System.out.println("Aantal analysers should be 2:"+analyzers.size());
             updateAlgorithmsDropdown();
           }
         });
